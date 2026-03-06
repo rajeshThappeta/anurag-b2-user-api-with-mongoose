@@ -1,0 +1,36 @@
+### Read all users
+GET http://localhost:4000/user-api/users
+
+### Read a user by id
+GET http://localhost:4000/user-api/users/69aa9cb4f73724a8a79b476
+
+### Create new user
+POST http://localhost:4000/user-api/users
+Content-Type: application/json
+
+{
+    "username":"kir",
+    "password":"kiran",
+    "email":"kiran@mail.com",
+    "age":20
+}
+
+
+### Update a User
+PUT http://localhost:4000/user-api/users/69aa8b34b58f738b45eed7cd
+Content-Type: application/json
+
+{
+    "username":"bhanukumar",
+    "password":"bhanukumar",
+    "email":"bhanukumat@mail.com",
+    "age":20
+}
+
+
+### Delete a user by ID
+DELETE http://localhost:4000/user-api/users/69aa8a4393875279636a2d70
+
+
+### Create reqs  for Product API 
+GET http://localhost:3000/product-api/users
