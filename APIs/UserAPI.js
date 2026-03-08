@@ -1,18 +1,51 @@
 //create min-express app(Seperate route)
 import exp from "express";
 import { UserModel } from "../models/UserModel.js";
-import {hash} from 'bcryptjs'
+import { hash, compare } from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { verifyToken } from "../middlewares/verifyToken.js";
+const { sign } = jwt;
 export const userApp = exp.Router();
 
 //DEFINE USER REST API Routes
+
+//user login
+userApp.post("/auth", async (req, res) => {
+  //get user cred obj from client
+  const { email, password } = req.body;
+  //verify email
+  let user = await UserModel.findOne({ email: email });
+  //if email not existed
+  if (user === null) {
+    return res.status(400).json({ message: "Invalid email" });
+  }
+  //compare passwords
+  let result = await compare(password, user.password);
+  //if passwords not matched
+  if (result === false) {
+    return res.status(400).json({ message: "Invalid password" });
+  }
+  //if passwords are matched
+  //create token (jsonwebtoken -jwt--jaat)
+  const signedToken = sign({ email: user.email }, "abcdef", { expiresIn: "1h" });
+  //store token as httpOnly cookie
+  res.cookie("token",signedToken,{
+    httpOnly:true,
+    sameSite:"lax",
+    secure:false
+  })
+  //send res
+  res.status(200).json({message:"login success",payload:user})  
+});
+
 //Create new User
 userApp.post("/users", async (req, res) => {
   //get new user obj from req
   const newUser = req.body;
   //hash the password
-  const hashedPassword=await hash(newUser.password,10)
+  const hashedPassword = await hash(newUser.password, 10);
   //replace plain password with hashed password
-  newUser.password=hashedPassword;
+  newUser.password = hashedPassword;
   //Create new user document
   const newUserDocument = new UserModel(newUser);
   //save
@@ -22,8 +55,8 @@ userApp.post("/users", async (req, res) => {
   res.status(201).json({ message: "User created" });
 });
 
-//Read all users
-userApp.get("/users", async (req, res) => {
+//Read all users(protected route)
+userApp.get("/users",verifyToken ,async (req, res) => {
   //read all users from db
   let usersList = await UserModel.find();
   //send res
@@ -54,7 +87,7 @@ userApp.put("/users/:id", async (req, res) => {
   const updatedUser = await UserModel.findByIdAndUpdate(
     uid,
     { $set: { ...modifiedUser } },
-    { new: true,runValidators:true},
+    { new: true, runValidators: true },
   );
   //send res
   res.status(200).json({ message: "User modified", payload: updatedUser });
@@ -73,7 +106,6 @@ userApp.delete("/users/:id", async (req, res) => {
   res.status(200).json({ message: "user removed", payload: deletedUser });
 });
 
-
 // User created   === "User  created" -->false
 // 200 -- success
 // 201 -- created
@@ -81,3 +113,8 @@ userApp.delete("/users/:id", async (req, res) => {
 // 401 -- Unauthorised
 // 404 -- Not found
 // 500 -- Server error
+
+
+//app.use(verifyToken) -->every req
+//userApp.get(path,verifyToken,req-handler)
+

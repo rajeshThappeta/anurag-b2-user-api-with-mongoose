@@ -35,7 +35,24 @@ hello--->sdfbsdf7df6s7dfnbdf87sdf
 
 
 
-### User Authentication
+### User Authentication(Login)
+        -Submit credentials and get token
+
+
+        req-----> Public routes (By anyone)
+        
+        req--- middleware---> Protected routes( By authenticated users only)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -48,10 +65,19 @@ Create Product REST API with below features
         b.productName(required)
         c.price(required, min price 10000 and max price 50000)
         d.brand(required)
-        
+
 2. REST API with below operations
         a. Create product
         b. Read all products
         c. Read a product by productId
         d. Update a product by productId
         e. Delete a product by productId
+
+
+
+
+Make the following routes protected
+        - Read Users & Products
+        - Read User & Product by id
+        - Update User & Product
+        - Delete User & Product

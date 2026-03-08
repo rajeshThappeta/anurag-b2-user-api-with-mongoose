@@ -2,9 +2,12 @@
 import exp from "express";
 import { connect } from "mongoose";
 import { userApp } from "./APIs/UserAPI.js";
+import cookieParser from "cookie-parser";
 const app = exp();
 //add body parser
 app.use(exp.json());
+//add cookie parser miidleware
+app.use(cookieParser())
 //forward req to UserAPP if path starts with /user-api
 app.use("/user-api", userApp);
 
@@ -25,6 +28,9 @@ connectDB();
 
 //error handling middleware
 app.use((err, req, res, next) => {
+  // console.log(err)
+  // console.log(err?.errorResponse?.code)
+  // console.log(err?.cause?.code )
   //ValidationError
   if (err.name === "ValidationError") {
     return res.status(400).json({ message: "error occurred", error: err.message });
